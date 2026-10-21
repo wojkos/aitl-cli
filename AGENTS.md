@@ -62,9 +62,16 @@ Read it before writing code; its **Target** items are adopted only through a spe
 ├── runs/                   # one log per autonomous AI run
 │   └── YYYY-MM-DD-slug.md
 ├── lessons.md              # index + short lessons learned (read this first)
-└── lessons/                # long-form lessons, one topic per file
-    └── YYYY-MM-DD-slug.md
+├── lessons/                # long-form lessons, one topic per file
+│   └── YYYY-MM-DD-slug.md
+├── agentic.config.json     # om-* agent pipeline config (base branch, validation gate, labels)
+├── trackers/, browsers/    # pipeline descriptors: how skills talk to GitHub / a browser
+└── analysis/, scripts/, qa/  # pipeline working dirs (generated reports, env scripts, QA)
 ```
+
+The delivery process (ticket flow, labels, QA gate, claim protocol) is in [`SDLC.md`](SDLC.md);
+change it together with `.ai/agentic.config.json`. Autonomous `om-auto-*` runs write their
+execution plan to `.ai/runs/YYYY-MM-DD-slug.md` — that plan is the run log.
 
 `.ai/cezar/` is local tooling state (worktrees, scratch) — it is git-ignored; never put
 project metadata there.
