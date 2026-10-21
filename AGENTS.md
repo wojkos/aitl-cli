@@ -28,6 +28,10 @@ CI runs typecheck, tests and build on Node 18/20/22 and on Windows — keep code
 (see `spawnSpec` in `src/core.ts`). If you change lessons or CLI behaviour, update `README.md` to
 match.
 
+**Engineering standards:** the tech stack, coding standards, design patterns, and testing and
+release rules are in [`.ai/docs/engineering-standards.md`](.ai/docs/engineering-standards.md).
+Read it before writing code; its **Target** items are adopted only through a spec.
+
 ## How to work
 
 - **Plan before complex work.** For anything touching several files or changing behaviour, plan
@@ -50,6 +54,7 @@ match.
 
 ```
 .ai/
+├── docs/                   # long-lived reference docs (engineering-standards.md)
 ├── specs/                  # SDD specifications
 │   ├── YYYY-MM-DD-slug.md  #   active: approved or in progress
 │   ├── implemented/        #   specs that are fully shipped
@@ -75,7 +80,9 @@ Every file in `specs/`, `runs/` and `lessons/` (including `implemented/` and `ar
   (`2026-10-21-cumulative-optional-skills.md`).
 - If the name is already taken, add a suffix: `…-slug-2.md`.
 
-Only the `README.md` files that document each folder break this rule.
+Only the `README.md` files that document each folder break this rule. `.ai/docs/` holds living
+reference documents, so they get stable undated names (`engineering-standards.md`) and are
+updated in place.
 
 ### Workflow — what every agent must do
 
