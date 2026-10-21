@@ -42,8 +42,10 @@ not visible.
 
 ## Open questions
 - Should `lint`, `build` and `test` be required status checks on `main`? (`main` has no branch
-  protection today.)
+  protection today.) Since #5, `ci.yml` skips docs-only changes (`paths-ignore`), so requiring
+  them first needs a fallback for docs-only PRs (see `.ai/lessons.md`).
 
 ## Changelog
 - 2026-10-21 — created and implemented on `cez/43251ab7`.
 - 2026-10-21 — shipped as PR #6 (`feat/ci-lint-and-test-checks`); reference added after review.
+- 2026-10-21 — merged `feat/ai-workspace-setup` (#5 `paths-ignore` CI); open question updated.
