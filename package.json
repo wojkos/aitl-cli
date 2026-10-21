@@ -2,13 +2,25 @@
   "name": "aitl-cli",
   "version": "0.1.0",
   "description": "Install exactly the agent skills needed for a given AITL course lesson.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wojkos/aitl-cli.git"
+  },
+  "homepage": "https://github.com/wojkos/aitl-cli#readme",
+  "bugs": {
+    "url": "https://github.com/wojkos/aitl-cli/issues"
+  },
   "type": "module",
   "bin": {
     "aitl-cli": "dist/cli.js",
     "aitl": "dist/cli.js"
   },
-  "files": ["dist"],
-  "engines": { "node": ">=18" },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
