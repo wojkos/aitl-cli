@@ -4,7 +4,7 @@ status: implemented
 created: 2026-10-21
 updated: 2026-10-21
 owner: Claude Code (claude-opus-5-5), cezar task 43251ab7
-related: [".ai/docs/engineering-standards.md §8 step 1", "branch cez/43251ab7"]
+related: [".ai/docs/engineering-standards.md §8 step 1", "PR #6 (branch feat/ci-lint-and-test-checks)"]
 ---
 
 # CI checks on every PR — build, lint, unit tests with coverage
@@ -46,3 +46,4 @@ not visible.
 
 ## Changelog
 - 2026-10-21 — created and implemented on `cez/43251ab7`.
+- 2026-10-21 — shipped as PR #6 (`feat/ci-lint-and-test-checks`); reference added after review.

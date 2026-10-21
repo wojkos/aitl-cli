@@ -28,9 +28,8 @@ npm run build       # tsc -> dist/
 
 CI (`.github/workflows/ci.yml`) runs on every PR as separate checks — `lint`, `build`
 (typecheck, build, CLI smoke run, `npm pack --dry-run`, `publint`) and `test` on Node 18/20/22,
-plus `windows` — keep code cross-platform
-(see `spawnSpec` in `src/core.ts`). If you change lessons or CLI behaviour, update `README.md` to
-match.
+plus `windows` — keep code cross-platform (see `spawnSpec` in `src/core.ts`). If you change
+lessons or CLI behaviour, update `README.md` to match.
 
 **Engineering standards:** the tech stack, coding standards, design patterns, and testing and
 release rules are in [`.ai/docs/engineering-standards.md`](.ai/docs/engineering-standards.md).

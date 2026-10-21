@@ -291,7 +291,8 @@ in this order, because each one makes the next safer:
 
 1. **Tooling (no behaviour change)** — *done 2026-10-21,
    [spec](../specs/implemented/2026-10-21-ci-lint-and-test-checks.md)*: add Biome with the §2.4
-   config, then a formatting-only commit, then fix the lint findings. Add `publint` to CI. Add `"lint": "biome check ."` to the scripts.
+   config, then a formatting-only commit, then fix the lint findings. Add `publint` to CI. Add
+   `"lint": "biome check ."` to the scripts.
 2. **Strictness:** enable the §2.3 compiler flags and remove the now-redundant `!` assertions.
 3. **Platform floor (major release, 1.0.0 or 0.2.0 while pre-1.0):** set `engines.node` to
    `>=22.20`, change the CI matrix to 22/24/26, upgrade `typescript` to 7.x, `commander` to 15.x and
