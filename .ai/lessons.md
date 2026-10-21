@@ -1,0 +1,17 @@
+# Lessons learned
+
+Long-term memory for agents and humans working on this repo. Read it before starting a task; add
+to it after fixing a bug or learning something non-obvious. Newest first, one bullet each:
+
+`- YYYY-MM-DD — **Rule in one line.** Why / context. ([details](lessons/YYYY-MM-DD-slug.md))`
+
+Long write-ups go in `lessons/`. Update or remove entries that become wrong; don't duplicate.
+
+## Lessons
+
+<!-- Add new lessons at the top of this list. -->
+
+- 2026-10-21 — **Never spawn `npx` directly on Windows; go through `spawnSpec()` in `src/core.ts`.**
+  Since the CVE-2024-27980 fix Node refuses to spawn `.cmd` shims like `npx.cmd` without a shell
+  (`EINVAL`), so on Windows the command goes to `cmd.exe` as one string quoted by `cmdQuote()`,
+  which rejects cmd metacharacters. Fixed in 9647f45; the CI `windows` job guards it.
