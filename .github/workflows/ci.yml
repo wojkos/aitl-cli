@@ -1,8 +1,18 @@
 name: CI
 
 on:
+  # Docs-only changes (Markdown, .ai/ metadata) skip CI entirely. Publishing is already gated on a
+  # version bump, and a bump touches package.json, so it is never skipped.
   pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - '.ai/**'
+  # Only main: PR branches are already covered by pull_request, so this avoids running twice.
   push:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - '.ai/**'
 
 concurrency:
   group: ci-${{ github.ref }}
