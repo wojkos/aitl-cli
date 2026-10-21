@@ -274,7 +274,12 @@ covered by smoke runs.
 - The version bump goes in the same PR as the change, in both `package.json` and the lockfile
   (`npm version <level> --no-git-tag-version`).
 - Releases happen only from the default branch via CI (the existing `publish` job, which skips
-  versions that are already published). No manual `npm publish`.
+  versions that are already published). No manual `npm publish`. A PR without a version bump
+  (docs, tests, refactors) therefore never ships a package.
+- CI runs on pull requests and on pushes to `main` only. It skips changes that touch nothing but
+  Markdown files or `.ai/` (`paths-ignore` in `ci.yml`). Test-only changes still run it. If branch
+  protection ever requires the CI checks, add a no-op fallback for docs-only PRs first, or they
+  will wait forever for a check that never reports.
 - Commits: [Conventional Commits](https://www.conventionalcommits.org/) subject —
   `type(scope): imperative summary`, 72 characters or fewer (`fix(core): …`, `docs(runs): …`), the
   form the `om-*` pipeline skills already use — and a body that explains *why*. One logical change

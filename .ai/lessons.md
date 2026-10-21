@@ -14,6 +14,12 @@ Long write-ups go in `lessons/`. Update or remove entries that become wrong; don
 - 2026-10-21 — **Keep Biome scoped with `files.includes`; never run it unscoped with `--write`.**
   Biome 2.6 also formats Markdown, so an unscoped `biome check --write .` rewrites every doc and
   `.ai/` file (tables, wrapped lines). `biome.json` limits it to `src/`, `test/` and root JSON.
+
+- 2026-10-21 — **Before making a CI check required in branch protection, give docs-only PRs a
+  fallback.** `ci.yml` skips Markdown/`.ai/`-only changes with `paths-ignore`. A skipped workflow
+  reports no status, so a required check would leave those PRs waiting forever. No package
+  ships without a version bump, because `publish` skips versions already on npm.
+
 - 2026-10-21 — **Automated review of an automation-authored PR cannot formally approve it; record a
   COMMENT review and ask a different reviewer to approve.** The om-* pipeline runs as `wojkos`, the
   same account that opens PRs, and GitHub rejects self-approval. Local `gh` is 2.45 (< 2.82.1), so
