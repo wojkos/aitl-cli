@@ -24,9 +24,27 @@ npm test            # compile tests + node --test
 npm run build       # tsc -> dist/
 ```
 
-Run `npm run typecheck` and `npm test` before declaring any code change done. CI runs them on
-Node 18/20/22 and on Windows — keep code cross-platform (see `spawnSpec` in `src/core.ts`).
-If you change lessons or CLI behaviour, update `README.md` to match.
+CI runs typecheck, tests and build on Node 18/20/22 and on Windows — keep code cross-platform
+(see `spawnSpec` in `src/core.ts`). If you change lessons or CLI behaviour, update `README.md` to
+match.
+
+## How to work
+
+- **Plan before complex work.** For anything touching several files or changing behaviour, plan
+  first (plan mode in Claude Code) and get the plan agreed — the plan is the spec in `.ai/specs/`.
+  If implementation goes sideways, stop and re-plan instead of pushing through.
+- **Verify, don't assume.** A change is done only when you have proof: `npm run typecheck` and
+  `npm test` pass, and behaviour changes are exercised for real (e.g.
+  `node dist/cli.js get l03 --dry-run` after `npm run build`). Every bug fix gets a test that fails
+  without it. Report what you ran and what it printed; never claim success you have not seen.
+- **Prefer the elegant fix.** If a fix ends up hacky, step back and, knowing what you know now,
+  replace it with the clean solution rather than layering patches.
+- **Own bugs end to end.** Given a bug report or failing CI, find the root cause and fix it without
+  waiting to be told how; ask only when a decision is genuinely the user's.
+- **Use parallelism for independent work.** Separate git worktrees or sub-agents suit unrelated
+  tasks and wide read-only investigations; keep one tightly coupled change in one session.
+- **Turn repetition into tooling.** A workflow you repeat often belongs in a committed skill or
+  slash command (`.claude/skills/`, `.claude/commands/`), not in ad-hoc prompts.
 
 ## The `.ai/` folder — mandatory
 
@@ -77,9 +95,11 @@ Only the `README.md` files that document each folder break this rule.
    run starts, keep it updated, and finish it with the outcome. Interactive pair-programming
    sessions do not need a run log unless asked. Run logs are append-only history — never rewrite
    another run's log.
-5. **Lessons learned:** after fixing a bug, discovering a non-obvious constraint, or hitting a
-   mistake worth not repeating, record it (see below). This is the project's long-term memory —
-   prefer it over any tool-private memory so every agent benefits.
+5. **Lessons learned:** after fixing a bug, being corrected by the user, discovering a non-obvious
+   constraint, or hitting a mistake worth not repeating, record it (see below) before finishing —
+   phrased as a rule that prevents the repeat. If the correction is a general way-of-working rule,
+   update this file instead. This is the project's long-term memory — prefer it over any
+   tool-private memory so every agent benefits.
 
 ### Lessons: `lessons.md` vs `lessons/`
 
