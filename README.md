@@ -71,7 +71,9 @@ The authoritative data lives in `src/lessons.ts`; run `aitl-cli info <lesson>` f
 npm install
 npm run build      # tsc -> dist/
 npm run typecheck
+npm run lint       # Biome: lint + format + import order (lint:fix to auto-fix)
 npm test           # node:test
+npm run test:coverage   # node:test + coverage of src/ (Node >= 22.5)
 ```
 
 Requires Node.js >= 18.

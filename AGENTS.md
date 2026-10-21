@@ -20,11 +20,15 @@ Commands:
 
 ```bash
 npm run typecheck   # tsc --noEmit
+npm run lint        # Biome check (npm run lint:fix applies safe fixes + formatting)
 npm test            # compile tests + node --test
+npm run test:coverage  # tests + coverage report for src/ (Node >= 22.5)
 npm run build       # tsc -> dist/
 ```
 
-CI runs typecheck, tests and build on Node 18/20/22 and on Windows — keep code cross-platform
+CI (`.github/workflows/ci.yml`) runs on every PR as separate checks — `lint`, `build`
+(typecheck, build, CLI smoke run, `npm pack --dry-run`, `publint`) and `test` on Node 18/20/22,
+plus `windows` — keep code cross-platform
 (see `spawnSpec` in `src/core.ts`). If you change lessons or CLI behaviour, update `README.md` to
 match.
 
@@ -37,8 +41,8 @@ Read it before writing code; its **Target** items are adopted only through a spe
 - **Plan before complex work.** For anything touching several files or changing behaviour, plan
   first (plan mode in Claude Code) and get the plan agreed — the plan is the spec in `.ai/specs/`.
   If implementation goes sideways, stop and re-plan instead of pushing through.
-- **Verify, don't assume.** A change is done only when you have proof: `npm run typecheck` and
-  `npm test` pass, and behaviour changes are exercised for real (e.g.
+- **Verify, don't assume.** A change is done only when you have proof: `npm run typecheck`,
+  `npm run lint` and `npm test` pass, and behaviour changes are exercised for real (e.g.
   `node dist/cli.js get l03 --dry-run` after `npm run build`). Every bug fix gets a test that fails
   without it. Report what you ran and what it printed; never claim success you have not seen.
 - **Prefer the elegant fix.** If a fix ends up hacky, step back and, knowing what you know now,
