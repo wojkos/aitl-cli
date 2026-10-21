@@ -11,6 +11,10 @@ Long write-ups go in `lessons/`. Update or remove entries that become wrong; don
 
 <!-- Add new lessons at the top of this list. -->
 
+- 2026-10-21 — **Keep Biome scoped with `files.includes`; never run it unscoped with `--write`.**
+  Biome 2.6 also formats Markdown, so an unscoped `biome check --write .` rewrites every doc and
+  `.ai/` file (tables, wrapped lines). `biome.json` limits it to `src/`, `test/` and root JSON.
+
 - 2026-10-21 — **Before making a CI check required in branch protection, give docs-only PRs a
   fallback.** `ci.yml` skips Markdown/`.ai/`-only changes with `paths-ignore`. A skipped workflow
   reports no status, so a required check would leave those PRs waiting forever. No package

@@ -19,6 +19,18 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Biome (lint + format + import order)
+        run: npx biome ci .
+
   build:
     runs-on: ubuntu-latest
     strategy:
@@ -33,9 +45,40 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck
-      - run: npm test
       - run: npm run build
+      - name: Smoke-test the built CLI
+        run: node dist/cli.js get l03 --dry-run
       - run: npm pack --dry-run
+      - run: npx publint
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [18, 20, 22]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci
+      - run: npm test
+        if: matrix.node-version != 22
+      # Coverage needs Node >= 22.5 (--test-coverage-include); it is reported, not gated.
+      - name: Unit tests with coverage
+        if: matrix.node-version == 22
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run test:coverage | tee coverage.txt
+          {
+            echo '### Unit test coverage'
+            echo '```'
+            sed -n '/start of coverage report/,/end of coverage report/p' coverage.txt | sed 's/^# //'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
   windows:
     runs-on: windows-latest
@@ -61,7 +104,7 @@ jobs:
           "
 
   publish:
-    needs: [build, windows]
+    needs: [lint, build, test, windows]
     # Publish only after a merge into the default branch.
     if: github.event_name == 'push' && github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest

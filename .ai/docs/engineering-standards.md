@@ -46,9 +46,9 @@ correct*, not *most featureful*.
 | Module system | ESM, `NodeNext` | same | Native ESM is the Node standard; `NodeNext` enforces correct `.js` import specifiers. |
 | CLI framework | `commander` 12 | **`commander` 15** | Stays the only runtime dependency. v15 needs Node `>=22.12`, which the new floor covers. Verified: compiles and tests pass unchanged. |
 | Build | `tsc` → `dist/` | same | No bundler: the output is a few small ES modules, and readable `dist/` is easier to debug for users. Revisit (e.g. `tsdown`) only if start-up time or install size becomes a measured problem. |
-| Tests | `node:test` + `node:assert/strict`, compiled first | same; add `--experimental-test-coverage` reporting | Built into Node, zero dependencies, fast. Vitest or Jest add nothing this project needs. |
-| Lint + format | none | **Biome 2.x** (one tool, one `biome.json`) | `typescript-eslint` 8.x only supports TypeScript `<6.1` (the TS 7 API is not ready yet), so ESLint cannot lint a TS 7 codebase with type information. Biome has no TypeScript dependency, needs no plugins, and runs in milliseconds. |
-| Package checks | `npm pack --dry-run` | add **`publint`** in CI | Catches broken `bin`/`exports`/`files` before publishing. Verified: "All good!" today. |
+| Tests | `node:test` + `node:assert/strict`, compiled first; coverage via `--experimental-test-coverage` (`npm run test:coverage`, reported in CI) | same | Built into Node, zero dependencies, fast. Vitest or Jest add nothing this project needs. |
+| Lint + format | **Biome 2.x** (one tool, one `biome.json`; `npm run lint`) | same | `typescript-eslint` 8.x only supports TypeScript `<6.1` (the TS 7 API is not ready yet), so ESLint cannot lint a TS 7 codebase with type information. Biome has no TypeScript dependency, needs no plugins, and runs in milliseconds. |
+| Package checks | `npm pack --dry-run` + **`publint`** in CI | same | Catches broken `bin`/`exports`/`files` before publishing. Verified: "All good!" today. |
 | Package manager | npm, committed `package-lock.json` | same | Matches the `npx` distribution model; no reason to add pnpm/yarn. |
 | CI | GitHub Actions; Node 18/20/22 matrix + Windows | **Node 22/24/26 matrix** + Windows | Test every supported LTS line. Node 24 is in maintenance LTS and 26 becomes Active LTS on 2026-10-28. |
 | Publishing | `npm publish --provenance` with `NPM_TOKEN` | **npm trusted publishing (OIDC)** | No long-lived token to leak. Provenance is generated automatically. Requires npm CLI `>=11.5.1` and Node `>=22.14` in the publish job; keep `permissions: id-token: write`. |
@@ -90,15 +90,18 @@ All of these flags were verified to pass on the current code with TypeScript 7:
 with Node's type stripping, but it rejects the parameter property in `UnknownLessonError`, and
 the build step is still needed for publishing anyway.
 
-### 2.4 Target `biome.json`
+### 2.4 `biome.json` (adopted)
 
 This config matches the existing style (2 spaces, single quotes, trailing commas). Adopting it
-reformats only about 95 lines, mostly in tests. Do that in one separate formatting-only commit.
+reformatted about 95 lines, mostly in tests, in one separate formatting-only commit. `files.includes`
+keeps Biome on code and root JSON configs: Biome 2.6 also formats Markdown, and left unscoped it
+rewrites every doc and `.ai/` file (tables, wrapped lines).
 
 ```json
 {
   "$schema": "https://biomejs.dev/schemas/2.6.2/schema.json",
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": { "includes": ["src/**", "test/**", "*.json"] },
   "formatter": { "indentStyle": "space", "indentWidth": 2, "lineWidth": 100 },
   "javascript": {
     "formatter": { "quoteStyle": "single", "trailingCommas": "all", "arrowParentheses": "always" }
@@ -107,9 +110,9 @@ reformats only about 95 lines, mostly in tests. Do that in one separate formatti
 }
 ```
 
-On today's code the recommended preset reports 7 errors and 9 warnings: non-null assertions,
-`forEach` callbacks that return a value, an assignment inside an expression, and an implicit-any
-`let`. Fix them in the adoption PR rather than disabling the rules.
+The recommended preset found non-null assertions, `forEach` callbacks that return a value, an
+assignment inside an expression, and an implicit-any `let`; they were fixed in the adoption PR
+rather than disabled. Keep it that way: fix new findings instead of adding `biome-ignore`.
 
 ---
 
@@ -253,12 +256,12 @@ src/cli.ts       SHELL     argv parsing, printing, spawning, exit codes
 npm run typecheck            # no errors
 npm test                     # all green
 npm run build && node dist/cli.js get l03 --dry-run   # behaviour exercised for real
-npx biome check .            # once Biome is adopted
+npm run lint                 # Biome: lint + format + import order
 npx publint                  # when package.json, bin or files change
 ```
 
-CI must be green on every Node version in the matrix and on Windows. Coverage (once reported —
-**Target**, see §2.1) is not gated: aim for full branch coverage of `core.ts`; `cli.ts` is
+CI must be green on every Node version in the matrix and on Windows. Coverage (`npm run test:coverage`,
+shown in the CI job summary) is not gated: aim for full branch coverage of `core.ts`; `cli.ts` is
 covered by smoke runs.
 
 ---
@@ -291,8 +294,10 @@ covered by smoke runs.
 These moves take the project from **Current** to **Target**. Each should be its own spec and PR,
 in this order, because each one makes the next safer:
 
-1. **Tooling (no behaviour change):** add Biome with the §2.4 config, then a formatting-only commit,
-   then fix the lint findings. Add `publint` to CI. Add `"lint": "biome check ."` to the scripts.
+1. **Tooling (no behaviour change)** — *done 2026-10-21,
+   [spec](../specs/implemented/2026-10-21-ci-lint-and-test-checks.md)*: add Biome with the §2.4
+   config, then a formatting-only commit, then fix the lint findings. Add `publint` to CI. Add
+   `"lint": "biome check ."` to the scripts.
 2. **Strictness:** enable the §2.3 compiler flags and remove the now-redundant `!` assertions.
 3. **Platform floor (major release, 1.0.0 or 0.2.0 while pre-1.0):** set `engines.node` to
    `>=22.20`, change the CI matrix to 22/24/26, upgrade `typescript` to 7.x, `commander` to 15.x and

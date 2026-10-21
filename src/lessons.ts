@@ -32,8 +32,7 @@ export const LESSONS: Lesson[] = [
     title: 'Pre-work',
     required: [],
     optional: [],
-    notes:
-      'No Open Mercato skills are needed yet. Learn the concepts and set up your environment.',
+    notes: 'No Open Mercato skills are needed yet. Learn the concepts and set up your environment.',
   },
   {
     id: 'l01',
@@ -49,8 +48,7 @@ export const LESSONS: Lesson[] = [
     title: 'Lesson 02',
     required: [],
     optional: [],
-    notes:
-      'om-setup-agent-pipeline is only previewed in this lesson; you run it in lesson 03.',
+    notes: 'om-setup-agent-pipeline is only previewed in this lesson; you run it in lesson 03.',
   },
   {
     id: 'l03',
@@ -144,8 +142,7 @@ export const LESSONS: Lesson[] = [
     title: 'Discovery',
     required: [],
     optional: [],
-    notes:
-      'You prepare materials for om-discover, which you run in practical lesson 04.',
+    notes: 'You prepare materials for om-discover, which you run in practical lesson 04.',
     extra: true,
   },
 ];

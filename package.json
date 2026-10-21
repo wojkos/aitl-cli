@@ -24,14 +24,19 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
     "test": "tsc -p tsconfig.test.json && node --test .test-dist/test/*.test.js",
+    "test:coverage": "tsc -p tsconfig.test.json && node --test --experimental-test-coverage \"--test-coverage-include=.test-dist/src/**\" .test-dist/test/*.test.js",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "commander": "^12.1.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.6.2",
     "@types/node": "^18.19.0",
+    "publint": "^0.3.25",
     "typescript": "^5.5.0"
   },
   "license": "MIT"

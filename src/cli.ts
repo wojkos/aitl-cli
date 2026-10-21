@@ -1,31 +1,39 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { Command as Program, InvalidArgumentError } from 'commander';
+import { InvalidArgumentError, Command as Program } from 'commander';
 import {
   buildCommands,
+  type Command,
   collectSkills,
   formatCommand,
   resolveLesson,
   skillSource,
   skillUsage,
   spawnSpec,
-  type Command,
 } from './core.js';
-import { DEFAULT_SOURCE, LESSONS } from './lessons.js';
+import { DEFAULT_SOURCE, LESSONS, type SkillRef } from './lessons.js';
 
-const pkg = JSON.parse(
-  readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
-) as { version: string };
+const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
+  version: string;
+};
 
 function fmtSkill(s: { name: string; source?: string }): string {
   return s.source && s.source !== DEFAULT_SOURCE ? `${s.name} (${s.source})` : s.name;
 }
 
 function pad(rows: string[][]): string {
-  const widths = rows[0]!.map((_, i) => Math.max(...rows.map((r) => r[i]!.length)));
+  const widths: number[] = [];
+  for (const r of rows) {
+    for (const [i, c] of r.entries()) widths[i] = Math.max(widths[i] ?? 0, c.length);
+  }
   return rows
-    .map((r) => r.map((c, i) => c.padEnd(widths[i]!)).join('  ').trimEnd())
+    .map((r) =>
+      r
+        .map((c, i) => c.padEnd(widths[i] ?? 0))
+        .join('  ')
+        .trimEnd(),
+    )
     .join('\n');
 }
 
@@ -85,13 +93,13 @@ program
         console.log('Nothing to install for this lesson.');
       } else {
         console.log('Install required skills:');
-        req.forEach((c) => console.log(`  ${formatCommand(c)}`));
+        for (const c of req) console.log(`  ${formatCommand(c)}`);
       }
       if (l.optional.length) {
         console.log('Install required + optional skills (--optional):');
-        buildCommands(collectSkills([l.id], { optional: true })).forEach((c) =>
-          console.log(`  ${formatCommand(c)}`),
-        );
+        for (const c of buildCommands(collectSkills([l.id], { optional: true }))) {
+          console.log(`  ${formatCommand(c)}`);
+        }
       }
     } catch (e) {
       fail(e);
@@ -114,7 +122,7 @@ program
   .option('-a, --agent <agent>', 'target agent, repeatable (passed to `skills add`)', collectAgent)
   .option('-y, --yes', 'skip confirmation prompts (passed to `skills add`)')
   .action(async (ids: string[], o) => {
-    let skills;
+    let skills: SkillRef[];
     try {
       skills = collectSkills(ids, { optional: o.optional, upto: o.upto || o.cumulative });
     } catch (e) {
@@ -130,7 +138,7 @@ program
     }
     const cmds = buildCommands(skills, { global: o.global, agent: o.agent, yes: o.yes });
     if (o.dryRun) {
-      cmds.forEach((c) => console.log(formatCommand(c)));
+      for (const c of cmds) console.log(formatCommand(c));
       return;
     }
     for (const c of cmds) {
