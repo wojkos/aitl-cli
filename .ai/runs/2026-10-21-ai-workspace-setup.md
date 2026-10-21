@@ -5,7 +5,7 @@ agent: Claude Code / claude-opus-5-5 (om-auto-create-pr)
 trigger: user request — "/om-auto-create-pr — Brief: Ship this branch's .ai setup"
 branch: feat/ai-workspace-setup (pushed from local cez/625e545e)
 spec: none (docs/process only — AGENTS.md exempts chores from SDD)
-status: in-progress
+status: done
 ---
 
 # Ship the .ai workspace setup as a PR
@@ -53,6 +53,8 @@ Cross-check that every path and link the docs reference resolves and that the fo
 
 ## Progress
 
+PR: #4
+
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles.
 
 ### Phase 1: Workspace content
@@ -65,3 +67,13 @@ Cross-check that every path and link the docs reference resolves and that the fo
 - [x] 2.1 Cross-check doc links and folder map; fix drift — no drift found (only unresolved path is git-ignored `.ai/cezar/`, by design)
 - [x] 2.2 Run the full validation gate — typecheck 0, test 14/14, build 0, pack 5 files (no .ai/docs files packed)
 - [x] Post-review fix: engineering-standards claims aligned with current tests and commit convention — c4ca0e5
+
+## Outcome
+
+PR #4 is ready for review, labelled `merge-queue`, `documentation`, `skip-qa`, `priority-low`, `risk-low`.
+Gate: typecheck, test 14/14, build and pack all pass. GitHub CI on 598c814 is green.
+`om-auto-review-pr` found 2 minors and 1 nit and fixed them in c4ca0e5. Its approval was
+recorded as a comment review because GitHub blocks self-approval, so a different reviewer must
+approve before merge. Open gap: 35 om-* skills referenced by the installed collection are not
+installed.
+
