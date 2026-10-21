@@ -27,8 +27,31 @@ jobs:
       - run: npm run build
       - run: npm pack --dry-run
 
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Smoke-test spawning npx.cmd
+        shell: bash
+        run: |
+          node --input-type=module -e "
+            import { spawnSync } from 'node:child_process';
+            import { spawnSpec } from './dist/core.js';
+            const s = spawnSpec({ command: 'npx.cmd', args: ['--version'] });
+            const r = spawnSync(s.command, s.args, { stdio: 'inherit', shell: s.shell });
+            if (r.error) throw r.error;
+            process.exit(r.status ?? 1);
+          "
+
   publish:
-    needs: build
+    needs: [build, windows]
     # Publish only after a merge into the default branch.
     if: github.event_name == 'push' && github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest

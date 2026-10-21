@@ -3,11 +3,13 @@ import assert from 'node:assert/strict';
 import {
   buildAddArgs,
   buildCommands,
+  cmdQuote,
   collectSkills,
   formatCommand,
   groupBySource,
   resolveLesson,
   skillUsage,
+  spawnSpec,
   UnknownLessonError,
 } from '../src/core.js';
 import type { Lesson } from '../src/lessons.js';
@@ -88,6 +90,24 @@ test('npx binary per platform and display format', () => {
   const c = buildCommands(collectSkills(['l03']), { yes: true }, 'linux')[0]!;
   assert.equal(c.command, 'npx');
   assert.match(formatCommand(c), /^npx skills add open-mercato\/skills --skill om-setup-agent-pipeline .* --yes$/);
+});
+
+test('spawn spec uses a shell only on Windows', () => {
+  const cmd = buildCommands(collectSkills(['l03']), { agent: ['claude code'] }, 'win32')[0]!;
+  const win = spawnSpec(cmd, 'win32');
+  assert.equal(win.shell, true);
+  assert.deepEqual(win.args, []);
+  assert.match(win.command, /^npx\.cmd skills add open-mercato\/skills --skill om-setup-agent-pipeline .* --agent "claude code"$/);
+  const nix = spawnSpec(buildCommands(collectSkills(['l03']), {}, 'linux')[0]!, 'linux');
+  assert.equal(nix.shell, false);
+  assert.equal(nix.command, 'npx');
+  assert.equal(nix.args[0], 'skills');
+});
+
+test('cmdQuote rejects cmd.exe metacharacters', () => {
+  assert.equal(cmdQuote('open-mercato/skills'), 'open-mercato/skills');
+  assert.equal(cmdQuote('a b'), '"a b"');
+  for (const bad of ['a&b', 'a|b', '%PATH%', 'a"b', 'a^b', 'a>b']) assert.throws(() => cmdQuote(bad));
 });
 
 test('works with custom lesson data', () => {
