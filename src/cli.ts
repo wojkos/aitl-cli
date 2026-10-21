@@ -9,6 +9,7 @@ import {
   resolveLesson,
   skillSource,
   skillUsage,
+  spawnSpec,
   type Command,
 } from './core.js';
 import { DEFAULT_SOURCE, LESSONS } from './lessons.js';
@@ -35,7 +36,8 @@ function fail(err: unknown): never {
 
 function run(cmd: Command): Promise<number> {
   return new Promise((resolve) => {
-    const child = spawn(cmd.command, cmd.args, { stdio: 'inherit', shell: false });
+    const spec = spawnSpec(cmd);
+    const child = spawn(spec.command, spec.args, { stdio: 'inherit', shell: spec.shell });
     child.on('error', (e) => {
       console.error(`Failed to run ${cmd.command}: ${e.message}`);
       resolve(127);

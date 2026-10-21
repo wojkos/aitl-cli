@@ -1,6 +1,6 @@
 {
   "name": "aitl-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Install exactly the agent skills needed for a given AITL course lesson.",
   "repository": {
     "type": "git",

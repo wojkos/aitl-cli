@@ -129,6 +129,32 @@ function shellQuote(s: string): string {
   return /^[\w@%+=:,./-]+$/.test(s) ? s : `'${s.replace(/'/g, `'\\''`)}'`;
 }
 
+export interface SpawnSpec {
+  command: string;
+  args: string[];
+  shell: boolean;
+}
+
+/**
+ * Quote one argument for cmd.exe. Rejects characters cmd.exe would still
+ * interpret inside double quotes, since no quoting makes them safe.
+ */
+export function cmdQuote(s: string): string {
+  if (/^[\w@+=:,./\\-]+$/.test(s)) return s;
+  if (/["%!^&|<>()\r\n]/.test(s)) throw new Error(`Unsafe argument for cmd.exe: ${s}`);
+  return `"${s}"`;
+}
+
+/**
+ * How to spawn a command. On Windows, npx is a .cmd shim, which Node refuses
+ * to spawn without a shell (EINVAL), so the command line goes to cmd.exe as a
+ * single pre-quoted string.
+ */
+export function spawnSpec(cmd: Command, platform: string = process.platform): SpawnSpec {
+  if (platform !== 'win32') return { command: cmd.command, args: cmd.args, shell: false };
+  return { command: [cmd.command, ...cmd.args].map(cmdQuote).join(' '), args: [], shell: true };
+}
+
 /** Display form of a command; always shows `npx` regardless of platform. */
 export function formatCommand(cmd: Command): string {
   return ['npx', ...cmd.args].map(shellQuote).join(' ');
