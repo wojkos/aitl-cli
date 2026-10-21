@@ -21,8 +21,8 @@ export function skillSource(skill: SkillRef): string {
 /** Normalizes forms like "3", "03", "l3", "L03", "lesson-03", "lesson03" to "l03". */
 function normalize(input: string): string {
   const s = input.trim().toLowerCase();
-  const m = /^(?:lesson[-_ ]?|l)?0*(\d{1,2})$/.exec(s);
-  if (m) return `l${m[1]!.padStart(2, '0')}`;
+  const digits = /^(?:lesson[-_ ]?|l)?0*(\d{1,2})$/.exec(s)?.[1];
+  if (digits) return `l${digits.padStart(2, '0')}`;
   return s;
 }
 
@@ -177,12 +177,15 @@ export function skillUsage(lessons: Lesson[] = LESSONS): SkillUsage[] {
   const touch = (s: SkillRef) => {
     const key = `${skillSource(s)}\u0000${s.name}`;
     let u = map.get(key);
-    if (!u) map.set(key, (u = { skill: s, required: [], optional: [] }));
+    if (!u) {
+      u = { skill: s, required: [], optional: [] };
+      map.set(key, u);
+    }
     return u;
   };
   for (const l of lessons) {
-    l.required.forEach((s) => touch(s).required.push(l.id));
-    l.optional.forEach((s) => touch(s).optional.push(l.id));
+    for (const s of l.required) touch(s).required.push(l.id);
+    for (const s of l.optional) touch(s).optional.push(l.id);
   }
   return [...map.values()];
 }

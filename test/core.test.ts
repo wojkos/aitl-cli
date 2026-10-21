@@ -1,5 +1,5 @@
-import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { test } from 'node:test';
 import {
   buildAddArgs,
   buildCommands,
@@ -15,6 +15,12 @@ import {
 import type { Lesson } from '../src/lessons.js';
 
 const names = (s: { name: string }[]) => s.map((x) => x.name);
+
+function first<T>(xs: T[]): T {
+  const [x] = xs;
+  assert.ok(x !== undefined, 'expected a non-empty array');
+  return x;
+}
 
 test('resolves ids and aliases forgivingly', () => {
   for (const i of ['l03', 'L3', '3', '03', 'lesson-03', 'Lesson03', ' l03 ']) {
@@ -129,8 +135,8 @@ test('builds args with passthrough flags', () => {
 });
 
 test('npx binary per platform and display format', () => {
-  assert.equal(buildCommands(collectSkills(['l03']), {}, 'win32')[0]!.command, 'npx.cmd');
-  const c = buildCommands(collectSkills(['l03']), { yes: true }, 'linux')[0]!;
+  assert.equal(first(buildCommands(collectSkills(['l03']), {}, 'win32')).command, 'npx.cmd');
+  const c = first(buildCommands(collectSkills(['l03']), { yes: true }, 'linux'));
   assert.equal(c.command, 'npx');
   assert.match(
     formatCommand(c),
@@ -139,7 +145,7 @@ test('npx binary per platform and display format', () => {
 });
 
 test('spawn spec uses a shell only on Windows', () => {
-  const cmd = buildCommands(collectSkills(['l03']), { agent: ['claude code'] }, 'win32')[0]!;
+  const cmd = first(buildCommands(collectSkills(['l03']), { agent: ['claude code'] }, 'win32'));
   const win = spawnSpec(cmd, 'win32');
   assert.equal(win.shell, true);
   assert.deepEqual(win.args, []);
@@ -147,7 +153,7 @@ test('spawn spec uses a shell only on Windows', () => {
     win.command,
     /^npx\.cmd skills add open-mercato\/skills --skill om-setup-agent-pipeline .* --agent "claude code"$/,
   );
-  const nix = spawnSpec(buildCommands(collectSkills(['l03']), {}, 'linux')[0]!, 'linux');
+  const nix = spawnSpec(first(buildCommands(collectSkills(['l03']), {}, 'linux')), 'linux');
   assert.equal(nix.shell, false);
   assert.equal(nix.command, 'npx');
   assert.equal(nix.args[0], 'skills');
@@ -170,7 +176,8 @@ test('works with custom lesson data', () => {
 
 test('skillUsage lists every skill with lessons', () => {
   const u = skillUsage();
-  const sd = u.find((x) => x.skill.name === 'om-synthetic-users')!;
+  const sd = u.find((x) => x.skill.name === 'om-synthetic-users');
+  assert.ok(sd);
   assert.deepEqual(sd.required, ['l04']);
   assert.deepEqual(sd.optional, ['l07']);
   const dedup = new Set(u.map((x) => x.skill.name));
