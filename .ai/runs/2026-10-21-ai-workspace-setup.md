@@ -62,5 +62,5 @@ Cross-check that every path and link the docs reference resolves and that the fo
 
 ### Phase 2: Consistency and validation
 
-- [ ] 2.1 Cross-check doc links and folder map; fix drift
-- [ ] 2.2 Run the full validation gate
+- [x] 2.1 Cross-check doc links and folder map; fix drift — no drift found (only unresolved path is git-ignored `.ai/cezar/`, by design)
+- [x] 2.2 Run the full validation gate — typecheck 0, test 14/14, build 0, pack 5 files (no .ai/docs files packed)
