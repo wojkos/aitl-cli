@@ -176,7 +176,7 @@ src/cli.ts       SHELL     argv parsing, printing, spawning, exit codes
 
 - Files: lowercase, one concern per file (`core.ts`, `lessons.ts`). Tests mirror sources:
   `test/<module>.test.ts`.
-- Functions are verbs (`resolveLesson`, `buildCommands`); predicates read as questions (`isExtra`);
+- Functions are verbs (`resolveLesson`, `buildCommands`); predicates read as questions (`isX`, `hasX`);
   constants are `UPPER_SNAKE` only for module-level fixed data (`LESSONS`, `DEFAULT_SOURCE`).
 - Lesson ids are canonical `prework`, `lNN`, or a lowercase word. Aliases live in `aliases`, never
   in parsing code.
@@ -239,8 +239,10 @@ src/cli.ts       SHELL     argv parsing, printing, spawning, exit codes
 - **Both platform branches are tested** by passing `platform: 'win32'` and `'linux'` explicitly.
   The Windows CI job additionally smoke-tests a real `npx.cmd` spawn.
 - **Every bug fix adds a test that fails without the fix** (see `AGENTS.md`).
-- **Catalogue invariants** are tested: unique ids and aliases, no skill both required and optional
-  in a lesson, extras flagged, and every external `source` in `owner/repo` form.
+- **Catalogue invariants** must be tested: unique ids and aliases, no skill both required and
+  optional in a lesson, extras flagged, and every external `source` in `owner/repo` form.
+  **Target:** no such test exists yet (`test/core.test.ts` covers behaviour only); add one with the
+  next change to `src/lessons.ts`.
 - Test names describe behaviour (`'required skills only by default'`), not function names.
 - Use `node:assert/strict` (`deepEqual`, `throws` with a validator). No snapshot tests: outputs are
   short enough to assert explicitly.
@@ -255,8 +257,9 @@ npx biome check .            # once Biome is adopted
 npx publint                  # when package.json, bin or files change
 ```
 
-CI must be green on every Node version in the matrix and on Windows. Coverage is reported, not
-gated: aim for full branch coverage of `core.ts`; `cli.ts` is covered by smoke runs.
+CI must be green on every Node version in the matrix and on Windows. Coverage (once reported —
+**Target**, see §2.1) is not gated: aim for full branch coverage of `core.ts`; `cli.ts` is
+covered by smoke runs.
 
 ---
 
@@ -269,7 +272,9 @@ gated: aim for full branch coverage of `core.ts`; `cli.ts` is covered by smoke r
   (`npm version <level> --no-git-tag-version`).
 - Releases happen only from the default branch via CI (the existing `publish` job, which skips
   versions that are already published). No manual `npm publish`.
-- Commits: imperative subject of 72 characters or fewer, body explains *why*. One logical change
+- Commits: [Conventional Commits](https://www.conventionalcommits.org/) subject —
+  `type(scope): imperative summary`, 72 characters or fewer (`fix(core): …`, `docs(runs): …`), the
+  form the `om-*` pipeline skills already use — and a body that explains *why*. One logical change
   per commit; formatting-only changes go in their own commit.
 - Non-trivial changes follow SDD (a spec in `.ai/specs/`). Lessons go in `.ai/lessons.md`. Both are
   described in `AGENTS.md`.
