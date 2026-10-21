@@ -2,7 +2,10 @@
 import { DEFAULT_SOURCE, LESSONS, type Lesson, type SkillRef } from './lessons.js';
 
 export class UnknownLessonError extends Error {
-  constructor(public readonly input: string, validIds: string[]) {
+  constructor(
+    public readonly input: string,
+    validIds: string[],
+  ) {
     super(
       `Unknown lesson "${input}". Valid lessons: ${validIds.join(', ')} ` +
         `(also accepted: 3, 03, l3, lesson-03).`,
@@ -25,10 +28,12 @@ function normalize(input: string): string {
 
 export function resolveLesson(input: string, lessons: Lesson[] = LESSONS): Lesson {
   const key = normalize(input);
-  const found = lessons.find(
-    (l) => l.id === key || l.aliases.some((a) => a.toLowerCase() === key),
-  );
-  if (!found) throw new UnknownLessonError(input, lessons.map((l) => l.id));
+  const found = lessons.find((l) => l.id === key || l.aliases.some((a) => a.toLowerCase() === key));
+  if (!found)
+    throw new UnknownLessonError(
+      input,
+      lessons.map((l) => l.id),
+    );
   return found;
 }
 

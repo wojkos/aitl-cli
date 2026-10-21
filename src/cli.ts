@@ -14,9 +14,9 @@ import {
 } from './core.js';
 import { DEFAULT_SOURCE, LESSONS } from './lessons.js';
 
-const pkg = JSON.parse(
-  readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
-) as { version: string };
+const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
+  version: string;
+};
 
 function fmtSkill(s: { name: string; source?: string }): string {
   return s.source && s.source !== DEFAULT_SOURCE ? `${s.name} (${s.source})` : s.name;
@@ -25,7 +25,12 @@ function fmtSkill(s: { name: string; source?: string }): string {
 function pad(rows: string[][]): string {
   const widths = rows[0]!.map((_, i) => Math.max(...rows.map((r) => r[i]!.length)));
   return rows
-    .map((r) => r.map((c, i) => c.padEnd(widths[i]!)).join('  ').trimEnd())
+    .map((r) =>
+      r
+        .map((c, i) => c.padEnd(widths[i]!))
+        .join('  ')
+        .trimEnd(),
+    )
     .join('\n');
 }
 

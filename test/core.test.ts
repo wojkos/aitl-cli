@@ -28,32 +28,54 @@ test('resolves ids and aliases forgivingly', () => {
 });
 
 test('unknown id throws helpful error', () => {
-  assert.throws(() => resolveLesson('l99'), (e: unknown) => {
-    assert.ok(e instanceof UnknownLessonError);
-    assert.match(e.message, /Valid lessons: prework, l01/);
-    return true;
-  });
+  assert.throws(
+    () => resolveLesson('l99'),
+    (e: unknown) => {
+      assert.ok(e instanceof UnknownLessonError);
+      assert.match(e.message, /Valid lessons: prework, l01/);
+      return true;
+    },
+  );
   assert.throws(() => resolveLesson('m1l3'), UnknownLessonError);
 });
 
 test('required skills only by default', () => {
-  assert.deepEqual(names(collectSkills(['l04'])), ['om-discover', 'om-backlog', 'om-synthetic-users']);
+  assert.deepEqual(names(collectSkills(['l04'])), [
+    'om-discover',
+    'om-backlog',
+    'om-synthetic-users',
+  ]);
 });
 
 test('--optional adds optional skills', () => {
-  assert.deepEqual(names(collectSkills(['l04'], { optional: true })).slice(-1), ['om-setup-discovery-pipeline']);
+  assert.deepEqual(names(collectSkills(['l04'], { optional: true })).slice(-1), [
+    'om-setup-discovery-pipeline',
+  ]);
 });
 
 test('cumulative includes earlier lessons, deduped, and skips extras', () => {
   const s = names(collectSkills(['l05'], { upto: true }));
   assert.deepEqual(s, [
-    'om-setup-agent-pipeline', 'om-prepare-issue', 'om-auto-fix-issue', 'om-code-review',
-    'om-discover', 'om-backlog', 'om-synthetic-users', 'om-spec-writing', 'grill-me',
+    'om-setup-agent-pipeline',
+    'om-prepare-issue',
+    'om-auto-fix-issue',
+    'om-code-review',
+    'om-discover',
+    'om-backlog',
+    'om-synthetic-users',
+    'om-spec-writing',
+    'grill-me',
   ]);
   // brownfield is not pulled into a cumulative range of a later lesson
-  assert.ok(!names(collectSkills(['l10'], { upto: true, optional: true })).includes('om-auto-create-pr-loop'));
+  assert.ok(
+    !names(collectSkills(['l10'], { upto: true, optional: true })).includes(
+      'om-auto-create-pr-loop',
+    ),
+  );
   // but named explicitly it works and --upto does not expand extras
-  assert.deepEqual(names(collectSkills(['brownfield'], { upto: true })), ['om-setup-agent-pipeline']);
+  assert.deepEqual(names(collectSkills(['brownfield'], { upto: true })), [
+    'om-setup-agent-pipeline',
+  ]);
 });
 
 test('dedupes across multiple lessons', () => {
@@ -63,10 +85,13 @@ test('dedupes across multiple lessons', () => {
 
 test('groups by source', () => {
   const g = groupBySource(collectSkills(['l05']));
-  assert.deepEqual([...g], [
-    ['open-mercato/skills', ['om-spec-writing']],
-    ['mattpocock/skills', ['grill-me']],
-  ]);
+  assert.deepEqual(
+    [...g],
+    [
+      ['open-mercato/skills', ['om-spec-writing']],
+      ['mattpocock/skills', ['grill-me']],
+    ],
+  );
   assert.equal(buildCommands(collectSkills(['l05'])).length, 2);
 });
 
@@ -79,8 +104,26 @@ test('empty lessons give no skills or commands', () => {
 
 test('builds args with passthrough flags', () => {
   assert.deepEqual(
-    buildAddArgs('open-mercato/skills', ['a', 'b'], { global: true, agent: ['claude-code', 'codex'], yes: true }),
-    ['skills', 'add', 'open-mercato/skills', '--skill', 'a', '--skill', 'b', '--global', '--agent', 'claude-code', '--agent', 'codex', '--yes'],
+    buildAddArgs('open-mercato/skills', ['a', 'b'], {
+      global: true,
+      agent: ['claude-code', 'codex'],
+      yes: true,
+    }),
+    [
+      'skills',
+      'add',
+      'open-mercato/skills',
+      '--skill',
+      'a',
+      '--skill',
+      'b',
+      '--global',
+      '--agent',
+      'claude-code',
+      '--agent',
+      'codex',
+      '--yes',
+    ],
   );
   assert.deepEqual(buildAddArgs('x/y', ['a']), ['skills', 'add', 'x/y', '--skill', 'a']);
 });
@@ -89,7 +132,10 @@ test('npx binary per platform and display format', () => {
   assert.equal(buildCommands(collectSkills(['l03']), {}, 'win32')[0]!.command, 'npx.cmd');
   const c = buildCommands(collectSkills(['l03']), { yes: true }, 'linux')[0]!;
   assert.equal(c.command, 'npx');
-  assert.match(formatCommand(c), /^npx skills add open-mercato\/skills --skill om-setup-agent-pipeline .* --yes$/);
+  assert.match(
+    formatCommand(c),
+    /^npx skills add open-mercato\/skills --skill om-setup-agent-pipeline .* --yes$/,
+  );
 });
 
 test('spawn spec uses a shell only on Windows', () => {
@@ -97,7 +143,10 @@ test('spawn spec uses a shell only on Windows', () => {
   const win = spawnSpec(cmd, 'win32');
   assert.equal(win.shell, true);
   assert.deepEqual(win.args, []);
-  assert.match(win.command, /^npx\.cmd skills add open-mercato\/skills --skill om-setup-agent-pipeline .* --agent "claude code"$/);
+  assert.match(
+    win.command,
+    /^npx\.cmd skills add open-mercato\/skills --skill om-setup-agent-pipeline .* --agent "claude code"$/,
+  );
   const nix = spawnSpec(buildCommands(collectSkills(['l03']), {}, 'linux')[0]!, 'linux');
   assert.equal(nix.shell, false);
   assert.equal(nix.command, 'npx');
@@ -107,11 +156,14 @@ test('spawn spec uses a shell only on Windows', () => {
 test('cmdQuote rejects cmd.exe metacharacters', () => {
   assert.equal(cmdQuote('open-mercato/skills'), 'open-mercato/skills');
   assert.equal(cmdQuote('a b'), '"a b"');
-  for (const bad of ['a&b', 'a|b', '%PATH%', 'a"b', 'a^b', 'a>b']) assert.throws(() => cmdQuote(bad));
+  for (const bad of ['a&b', 'a|b', '%PATH%', 'a"b', 'a^b', 'a>b'])
+    assert.throws(() => cmdQuote(bad));
 });
 
 test('works with custom lesson data', () => {
-  const custom: Lesson[] = [{ id: 'a', aliases: ['x'], title: 'A', required: [{ name: 's' }], optional: [], notes: '' }];
+  const custom: Lesson[] = [
+    { id: 'a', aliases: ['x'], title: 'A', required: [{ name: 's' }], optional: [], notes: '' },
+  ];
   assert.equal(resolveLesson('x', custom).id, 'a');
   assert.deepEqual(names(collectSkills(['a'], {}, custom)), ['s']);
 });
