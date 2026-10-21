@@ -1,0 +1,26 @@
+{
+  "name": "aitl-cli",
+  "version": "0.1.0",
+  "description": "Install exactly the agent skills needed for a given AITL course lesson.",
+  "type": "module",
+  "bin": {
+    "aitl-cli": "dist/cli.js",
+    "aitl": "dist/cli.js"
+  },
+  "files": ["dist"],
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsc -p tsconfig.test.json && node --test \".test-dist/test/*.test.js\"",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.19.0",
+    "typescript": "^5.5.0"
+  },
+  "license": "MIT"
+}
